@@ -16,7 +16,7 @@ import java.util.Set;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // TODO: ESTUDAR SEQUENCE E COMO SERIA A SINTAXE PARA ESCREVER DESTA FORMA
     private Long id;
 
     // Muitos pedidos podem pertencer ao mesmo cliente.

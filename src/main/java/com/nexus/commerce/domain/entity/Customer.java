@@ -9,7 +9,7 @@ import java.time.Instant;
 
 @Entity
 @Table(
-        name = "customers",
+        name = "customer",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_customer_email",
