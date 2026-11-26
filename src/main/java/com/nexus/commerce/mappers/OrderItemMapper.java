@@ -4,7 +4,7 @@ import com.nexus.commerce.domain.entity.OrderItem;
 import com.nexus.commerce.dto.OrderItemResponse;
 import org.mapstruct.*;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface OrderItemMapper {
     @Mapping(target = "orderId", source = "order.id")
     @Mapping(target = "productId", source = "product.id")

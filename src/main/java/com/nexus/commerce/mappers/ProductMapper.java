@@ -5,7 +5,7 @@ import com.nexus.commerce.dto.ProductRequest;
 import com.nexus.commerce.dto.ProductResponse;
 import org.mapstruct.*;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
     Product toEntity(ProductRequest request);
