@@ -5,5 +5,5 @@ public enum PaymentAttemptStatus {
     PROCESSING,
     SUCCESS,
     FAILED,
-    UNKNOW
+    UNKNOWN
 }

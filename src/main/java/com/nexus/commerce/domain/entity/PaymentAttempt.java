@@ -19,27 +19,21 @@ public class PaymentAttempt {
     @Column(nullable = false)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
 
     @CreationTimestamp
-    @Column(name = "attempted_at", updatable = false)
-    private Instant attempted_at;
+    @Column(name = "attempted_at", nullable = false, updatable = false)
+    private Instant attemptedAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_attempt_status")
+    @Column(name = "payment_attempt_status", nullable = false, length = 30)
     private PaymentAttemptStatus paymentAttemptStatus;
 
-    @Column(name = "gateway_transaction_id")
+    @Column(name = "gateway_transaction_id", length = 300)
     private String gatewayTransactionId;
 
-    @Column(name = "failureReason")
+    @Column(name = "failure_reason", length = 400)
     private String failureReason;
-
-    @PrePersist
-    private void setPaymentAttemptStatus() {
-        this.paymentAttemptStatus = PaymentAttemptStatus.PENDING;
-    }
-
 }
