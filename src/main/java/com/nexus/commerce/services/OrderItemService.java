@@ -6,6 +6,7 @@ import com.nexus.commerce.domain.entity.Product;
 import com.nexus.commerce.dto.OrderItemRequest;
 import com.nexus.commerce.dto.OrderItemResponse;
 import com.nexus.commerce.dto.OrderItemUpdateRequest;
+import com.nexus.commerce.exceptions.ResourceNotFoundException;
 import com.nexus.commerce.mappers.OrderItemMapper;
 import com.nexus.commerce.repositories.OrderItemRepository;
 import com.nexus.commerce.repositories.OrderRepository;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -77,16 +79,16 @@ public class OrderItemService {
 
     private OrderItem getOrderItem(Long id) {
         return repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Order item not found"));
+                new ResourceNotFoundException("Order item not found"));
     }
 
     private Order getOrder(Long id) {
         return orderRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+                new ResourceNotFoundException("Order not found"));
     }
 
     private Product getProduct(Long id) {
         return productRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+                new ResourceNotFoundException("Product not found"));
     }
 }

@@ -5,6 +5,7 @@ import com.nexus.commerce.domain.entity.Order;
 import com.nexus.commerce.domain.enums.OrderStatus;
 import com.nexus.commerce.dto.OrderRequest;
 import com.nexus.commerce.dto.OrderResponse;
+import com.nexus.commerce.exceptions.ResourceNotFoundException;
 import com.nexus.commerce.mappers.OrderMapper;
 import com.nexus.commerce.repositories.CustomerRepository;
 import com.nexus.commerce.repositories.OrderRepository;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -56,18 +58,17 @@ public class OrderService {
             repository.delete(order);
             repository.flush();
         } catch (DataIntegrityViolationException exception) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Order cannot be deleted because it has a payment associated with it", exception);
+            throw new DataIntegrityViolationException("Order cannot be deleted because it has a payment associated with it", exception);
         }
     }
 
     private Order getOrder(Long id) {
         return repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+                new ResourceNotFoundException("Order not found"));
     }
 
     private Customer getCustomer(Long id) {
         return customerRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+                new ResourceNotFoundException("Customer not found"));
     }
 }

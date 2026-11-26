@@ -3,6 +3,7 @@ package com.nexus.commerce.services;
 import com.nexus.commerce.domain.entity.Product;
 import com.nexus.commerce.dto.ProductRequest;
 import com.nexus.commerce.dto.ProductResponse;
+import com.nexus.commerce.exceptions.ResourceNotFoundException;
 import com.nexus.commerce.mappers.ProductMapper;
 import com.nexus.commerce.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 @Service
@@ -47,13 +49,12 @@ public class ProductService {
             repository.delete(product);
             repository.flush();
         } catch (DataIntegrityViolationException exception) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Product cannot be deleted because it is referenced by an order item", exception);
+            throw new DataIntegrityViolationException("Product cannot be deleted because it is referenced by an order item", exception);
         }
     }
 
     private Product getProduct(Long id) {
         return repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+                new ResourceNotFoundException("Product not found"));
     }
 }
