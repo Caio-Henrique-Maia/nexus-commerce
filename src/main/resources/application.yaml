@@ -1,3 +1,9 @@
 spring:
   application:
-    name: commerce
+    name: nexus-commerce
+  datasource:
+    url:${DB_DATABASE}
+    username:${DB_USERNAME}
+    password:${DB_PASSWORD}
+server:
+  port:8080
