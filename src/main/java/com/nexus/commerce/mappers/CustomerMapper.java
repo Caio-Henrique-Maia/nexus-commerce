@@ -6,11 +6,12 @@ import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CustomerMapper {
-
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     Customer toEntity(CustomerRequest customerRequest);
 
-//    CustomerRequest toDto(Customer customer); DEIXANDO DESATIVADO POR ENQUANTO, SÓ ENQUANTO NÃO FAÇO O RESPONSE
-
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     Customer partialUpdate(CustomerRequest customerRequest, @MappingTarget Customer customer);
 }
