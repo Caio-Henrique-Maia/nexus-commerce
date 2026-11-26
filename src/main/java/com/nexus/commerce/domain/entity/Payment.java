@@ -43,4 +43,10 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false, length = 30)
     private PaymentStatus paymentStatus;
+
+    @PrePersist
+    private void setPaymentStatus() {
+        this.paymentStatus = PaymentStatus.PENDING;
+    }
+
 }
