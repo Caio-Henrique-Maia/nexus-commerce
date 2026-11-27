@@ -7,5 +7,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface PaymentAttemptRepository extends JpaRepository<PaymentAttempt, Long> {
-    Optional<PaymentAttempt> findTopByPayment_IdOrderByAttemptedAtDesc(UUID paymentId);
+    Optional<PaymentAttempt> findTopByPayment_IdOrderByAttemptedAtDescIdDesc(UUID paymentId);
 }

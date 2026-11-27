@@ -10,15 +10,20 @@
 - [ ] Update the customer of an order using `PATCH /api/orders/{id}`; confirm that item details and total are unchanged.
 - [ ] Create a payment using `POST /api/payments` with an order ID and payment method; verify that the amount comes from the order total.
 - [ ] Try creating a second payment for the same order and verify that the API rejects it.
-- [ ] Process the payment using `POST /api/payments/process` with the order ID.
-- [ ] Repeat payment processing after a simulated timeout and verify that the same idempotency key is reused.
+- [ ] Process the payment using `POST /api/payments/process` with the order ID and optionally a payment method.
+- [ ] Verify that a failed attempt does not release stock and that a subsequent attempt can use a different payment method.
+- [ ] Repeat payment processing after a simulated timeout and verify that the same idempotency key and payment method are reused.
 - [ ] Verify that a confirmed payment cannot result in a second gateway charge.
+- [ ] Verify that an expired payment with no pending/unknown attempt changes the order and payment to EXPIRED and releases each product's stock once.
+- [ ] Verify that an expired payment with a PROCESSING or UNKNOWN attempt does not release stock.
+- [ ] Verify that concurrent expiration attempts release stock only once.
+- [ ] Verify that an order cannot be paid after it has expired.
 
 ## Follow-up engineering work
 
-- [ ] Add automated tests for order total calculation, nested DTO validation, payment creation, and duplicate payment prevention.
-- [ ] Make stock reservation/decrement atomic to prevent overselling under concurrent order creation.
-- [ ] Define order cancellation and stock release rules.
+- [ ] Add automated tests for order total calculation, nested DTO validation, payment creation, duplicate payment prevention, payment retries, and stock release on expiration.
+- [ ] Add reconciliation for stale UNKNOWN/PROCESSING payment attempts before releasing their reserved stock.
+- [ ] Define a manual order cancellation endpoint and release stock exactly once when cancellation is allowed.
 - [ ] Review whether order update should be restricted after payment processing starts.
 - [ ] Add authentication and derive the customer identity from the authenticated principal instead of accepting customerId from the request.
 - [ ] Introduce service boundaries and extract the payment module into an independent service only after the modular-monolith flow is stable.

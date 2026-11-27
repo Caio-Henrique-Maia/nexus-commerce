@@ -1,6 +1,7 @@
 package com.nexus.commerce.domain.entity;
 
 import com.nexus.commerce.domain.enums.PaymentAttemptStatus;
+import com.nexus.commerce.domain.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +31,10 @@ public class PaymentAttempt {
 
     @Column(name = "idempotency_key", nullable = false, unique = true)
     private UUID idempotencyKey;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method", nullable = false, length = 30)
+    private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_attempt_status", nullable = false, length = 30)
