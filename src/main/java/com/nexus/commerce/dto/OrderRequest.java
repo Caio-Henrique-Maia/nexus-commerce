@@ -13,7 +13,7 @@ public record OrderRequest(
         Long customerId,
 
         @NotEmpty(message = "Please inform at least one item")
-        List<@Valid OrderRequestItens> itens
+        List<@NotNull @Valid OrderRequestItens> itens
 ) {
     public record OrderRequestItens(
             @NotNull(message = "Please inform a product ID")
