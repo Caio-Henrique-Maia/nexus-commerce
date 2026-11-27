@@ -30,6 +30,10 @@ public class PaymentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
     }
 
+    private PaymentAttempt getLastAttempt(UUID paymentId) {
+        return paymentAttemptRepository.findMaxAttemptByPayment(paymentId);
+    }
+
     private PaymentGatewayRequest buildGatewayRequest(Payment payment) {
         return new PaymentGatewayRequest(payment.getPaidAmount(), payment.getPaymentMethod());
     }
@@ -39,12 +43,29 @@ public class PaymentService {
             payment.setPaymentStatus(PaymentStatus.CONFIRMED);
         } else if (attemptStatus == PaymentAttemptStatus.FAILED) {
             payment.setPaymentStatus(PaymentStatus.DENIED);
+        } else if (attemptStatus == PaymentAttemptStatus.UNKNOWN) {
+            payment.setPaymentStatus(PaymentStatus.PROCESS_ERROR);
         }
+    }
+
+    private PaymentGatewayResponse shouldNotBePaid(Payment payment) {
+        if (!paymentAttemptRepository.existsByPayment(payment)) {
+            return null;
+        }
+        PaymentAttempt lastAttempt = getLastAttempt(payment.getId());
+        if (payment.getPaymentStatus() == PaymentStatus.PROCESS_ERROR || lastAttempt.getPaymentAttemptStatus() == PaymentAttemptStatus.UNKNOWN) {
+            return new PaymentGatewayResponse(lastAttempt.getGatewayTransactionId(), lastAttempt.getPaymentAttemptStatus(), lastAttempt.getFailureReason());
+        }
+        return null;
     }
 
     @Transactional
     public PaymentGatewayResponse processPayment(ProcessPaymentRequest request) {
         Payment payment = findByIdOrThrow(request.paymentId());
+
+        if (shouldNotBePaid(payment) != null) {
+            return shouldNotBePaid(payment);
+        }
 
         PaymentAttempt attempt = new PaymentAttempt();
         attempt.setPayment(payment);
