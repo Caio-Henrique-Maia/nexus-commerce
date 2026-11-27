@@ -47,6 +47,7 @@ public class PaymentAttemptService {
         attempt.setPayment(payment);
         attempt.setIdempotencyKey(UUID.randomUUID());
         attempt.setPaymentAttemptStatus(PaymentAttemptStatus.PROCESSING);
+        payment.setPaymentStatus(PaymentStatus.PENDING);
 
         return paymentAttemptRepository.save(attempt);
     }
