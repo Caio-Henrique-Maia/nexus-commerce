@@ -3,6 +3,7 @@ package com.nexus.commerce.services;
 import com.nexus.commerce.domain.entity.Order;
 import com.nexus.commerce.domain.entity.Payment;
 import com.nexus.commerce.domain.entity.PaymentAttempt;
+import com.nexus.commerce.domain.enums.OrderStatus;
 import com.nexus.commerce.domain.enums.PaymentAttemptStatus;
 import com.nexus.commerce.dto.PaymentGatewayRequest;
 import com.nexus.commerce.dto.PaymentGatewayResponse;
@@ -50,6 +51,7 @@ public class PaymentService {
         payment.setOrder(order);
         payment.setPaymentMethod(request.paymentMethod());
         payment.setPaidAmount(amount);
+        order.setOrderStatus(OrderStatus.PAYMENT_PENDING);
 
         return mapper.toResponse(paymentRepository.save(payment));
     }
