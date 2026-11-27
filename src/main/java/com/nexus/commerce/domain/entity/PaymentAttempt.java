@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "payment_attempt")
@@ -26,6 +27,9 @@ public class PaymentAttempt {
     @CreationTimestamp
     @Column(name = "attempted_at", nullable = false, updatable = false)
     private Instant attemptedAt;
+
+    @Column(name = "idempotency_key", nullable = false, unique = true)
+    private UUID idempotencyKey;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_attempt_status", nullable = false, length = 30)
