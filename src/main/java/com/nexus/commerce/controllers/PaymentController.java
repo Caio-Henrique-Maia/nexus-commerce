@@ -19,8 +19,7 @@ public class PaymentController {
     private final PaymentService service;
 
     @PostMapping("/process")
-    public ResponseEntity<PaymentGatewayResponse> processPayment(
-            @Valid @RequestBody ProcessPaymentRequest request) {
+    public ResponseEntity<PaymentGatewayResponse> processPayment(@Valid @RequestBody ProcessPaymentRequest request) {
         return ResponseEntity.ok(service.processPayment(request));
     }
 }

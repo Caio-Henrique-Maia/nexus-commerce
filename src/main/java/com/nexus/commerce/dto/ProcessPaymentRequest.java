@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record ProcessPaymentRequest(
-        @NotNull(message = "Please provide a payment id")
-        UUID paymentId
+        @NotNull(message = "Please provide a order id")
+        Long orderId
 ) {
 }

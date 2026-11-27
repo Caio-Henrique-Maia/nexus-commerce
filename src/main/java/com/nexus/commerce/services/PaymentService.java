@@ -22,9 +22,10 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentAttemptService paymentAttemptService;
     private final PaymentGateway gateway;
+    private final OrderService orderService;
 
-    private Payment findByIdOrThrow(UUID id) {
-        return paymentRepository.findById(id)
+    private Payment findByOrderOrThrow(Long orderId) {
+        return paymentRepository.findByOrder(orderService.findByIdOrThrow(orderId))
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
     }
 
@@ -40,7 +41,8 @@ public class PaymentService {
     }
 
     public PaymentGatewayResponse processPayment(ProcessPaymentRequest request) {
-        Payment payment = findByIdOrThrow(request.paymentId());
+        Payment payment = findByOrderOrThrow(request.orderId());
+
         PaymentAttempt attempt = paymentAttemptService.prepareAttempt(payment.getId());
 
         if (attempt.getPaymentAttemptStatus() == PaymentAttemptStatus.SUCCESS) {

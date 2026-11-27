@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -21,6 +22,11 @@ import java.util.List;
 public class ProductService {
     private final ProductRepository repository;
     private final ProductMapper mapper;
+
+    public Product getProduct(Long id) {
+        return repository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Product not found"));
+    }
 
     public List<ProductResponse> findAll() {
         return repository.findAll().stream().map(mapper::toResponse).toList();
@@ -53,8 +59,18 @@ public class ProductService {
         }
     }
 
-    private Product getProduct(Long id) {
-        return repository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Product not found"));
+    public boolean hasStock(Product product, Integer requestQuantity) {
+        Integer currentStock = product.getStockQuantity();
+        if (currentStock == 0) {
+            return false;
+        }
+        return requestQuantity <= currentStock;
+    }
+
+    public boolean hasPositivePrice(Product product) {
+        if (product.getPrice() == null) {
+            return false;
+        }
+        return product.getPrice().compareTo(BigDecimal.ZERO) > 0;
     }
 }

@@ -1,5 +1,6 @@
 package com.nexus.commerce.repositories;
 
+import com.nexus.commerce.domain.entity.Order;
 import com.nexus.commerce.domain.entity.Payment;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT payment FROM Payment payment WHERE payment.id = :paymentId")
     Optional<Payment> findByIdForUpdate(@Param("paymentId") UUID paymentId);
+
+    Optional<Payment> findByOrder(Order order);
 }

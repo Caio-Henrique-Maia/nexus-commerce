@@ -2,19 +2,20 @@ package com.nexus.commerce.services;
 
 import com.nexus.commerce.domain.entity.Customer;
 import com.nexus.commerce.domain.entity.Order;
+import com.nexus.commerce.domain.entity.OrderItem;
+import com.nexus.commerce.domain.entity.Product;
 import com.nexus.commerce.domain.enums.OrderStatus;
 import com.nexus.commerce.dto.OrderRequest;
 import com.nexus.commerce.dto.OrderResponse;
 import com.nexus.commerce.exceptions.ResourceNotFoundException;
 import com.nexus.commerce.mappers.OrderMapper;
 import com.nexus.commerce.repositories.CustomerRepository;
+import com.nexus.commerce.repositories.OrderItemRepository;
 import com.nexus.commerce.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,6 +27,13 @@ public class OrderService {
     private final OrderRepository repository;
     private final CustomerRepository customerRepository;
     private final OrderMapper mapper;
+    private final ProductService productService;
+    private final OrderItemRepository orderItemRepository;
+
+    public Order findByIdOrThrow(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+    }
 
     public List<OrderResponse> findAll() {
         return repository.findAll().stream().map(mapper::toResponse).toList();
@@ -37,11 +45,30 @@ public class OrderService {
 
     @Transactional
     public OrderResponse create(OrderRequest request) {
+        BigDecimal totalAmount = BigDecimal.ZERO;
         Order order = new Order();
         order.setCustomer(getCustomer(request.customerId()));
-        order.setTotalAmount(BigDecimal.ZERO);
         order.setOrderStatus(OrderStatus.CREATED);
-        return mapper.toResponse(repository.save(order));
+        repository.save(order);
+
+        for (OrderRequest.OrderRequestItens itens : request.itens()) {
+            Product requestProd = productService.getProduct(itens.productId());
+
+            if (!productService.hasStock(requestProd, itens.quantity()) || !productService.hasPositivePrice(requestProd)) {
+                throw new IllegalStateException("Product : " + requestProd.getId() + " not available");
+            }
+
+            OrderItem item = new OrderItem();
+            item.setOrder(order);
+            item.setProduct(requestProd);
+            item.setQuantity(itens.quantity());
+            item.setUnitPrice(requestProd.getPrice());
+            orderItemRepository.save(item);
+            BigDecimal itemSubtotal = requestProd.getPrice().multiply(BigDecimal.valueOf(itens.quantity()));
+            totalAmount.add(itemSubtotal);
+        }
+        order.setTotalAmount(totalAmount);
+        return mapper.toResponse(order);
     }
 
     @Transactional
