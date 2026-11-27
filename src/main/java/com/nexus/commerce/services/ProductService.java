@@ -57,20 +57,4 @@ public class ProductService {
         } catch (DataIntegrityViolationException exception) {
             throw new DataIntegrityViolationException("Product cannot be deleted because it is referenced by an order item", exception);
         }
-    }
-
-    public boolean hasStock(Product product, Integer requestQuantity) {
-        Integer currentStock = product.getStockQuantity();
-        if (currentStock == 0) {
-            return false;
-        }
-        return requestQuantity <= currentStock;
-    }
-
-    public boolean hasPositivePrice(Product product) {
-        if (product.getPrice() == null) {
-            return false;
-        }
-        return product.getPrice().compareTo(BigDecimal.ZERO) > 0;
-    }
-}
+    }}

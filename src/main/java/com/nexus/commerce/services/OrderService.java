@@ -12,6 +12,7 @@ import com.nexus.commerce.exceptions.ResourceNotFoundException;
 import com.nexus.commerce.mappers.OrderMapper;
 import com.nexus.commerce.repositories.CustomerRepository;
 import com.nexus.commerce.repositories.OrderRepository;
+import com.nexus.commerce.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class OrderService {
     private final CustomerRepository customerRepository;
     private final OrderMapper mapper;
     private final ProductService productService;
+    private final ProductRepository productRepository;
 
     public Order findByIdOrThrow(Long id) {
         return repository.findById(id)
@@ -56,8 +58,10 @@ public class OrderService {
             Product product = productService.getProduct(entry.getKey());
             Integer quantity = entry.getValue();
 
-            if (!productService.hasStock(product, quantity) || !productService.hasPositivePrice(product)) {
-                throw new IllegalStateException("Product " + product.getId() + " is not available in the requested quantity");
+            int updatedRows = productRepository.reserveStock(product.getId(), quantity);
+
+            if (updatedRows == 0) {
+                throw new IllegalStateException("Insufficient stock for product: " + product.getId() + " : " + product.getName());
             }
 
             OrderItem item = new OrderItem();
@@ -73,24 +77,6 @@ public class OrderService {
 
         order.setTotalAmount(totalAmount);
         return mapper.toResponse(repository.save(order));
-    }
-
-    @Transactional
-    public OrderResponse updateCustomer(Long id, OrderCustomerUpdateRequest request) {
-        Order order = getOrder(id);
-        order.setCustomer(getCustomer(request.customerId()));
-        return mapper.toResponse(repository.save(order));
-    }
-
-    @Transactional
-    public void delete(Long id) {
-        Order order = getOrder(id);
-        try {
-            repository.delete(order);
-            repository.flush();
-        } catch (DataIntegrityViolationException exception) {
-            throw new DataIntegrityViolationException("Order cannot be deleted because it has a payment associated with it", exception);
-        }
     }
 
     private Map<Long, Integer> aggregateQuantities(List<OrderRequest.OrderRequestItens> items) {
@@ -113,5 +99,23 @@ public class OrderService {
     private Customer getCustomer(Long id) {
         return customerRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Customer not found"));
+    }
+
+    @Transactional
+    public OrderResponse updateCustomer(Long id, OrderCustomerUpdateRequest request) {
+        Order order = getOrder(id);
+        order.setCustomer(getCustomer(request.customerId()));
+        return mapper.toResponse(repository.save(order));
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        Order order = getOrder(id);
+        try {
+            repository.delete(order);
+            repository.flush();
+        } catch (DataIntegrityViolationException exception) {
+            throw new DataIntegrityViolationException("Order cannot be deleted because it has a payment associated with it", exception);
+        }
     }
 }
