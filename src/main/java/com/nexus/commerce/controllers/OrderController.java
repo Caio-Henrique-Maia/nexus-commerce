@@ -1,5 +1,6 @@
 package com.nexus.commerce.controllers;
 
+import com.nexus.commerce.dto.OrderCustomerUpdateRequest;
 import com.nexus.commerce.dto.OrderRequest;
 import com.nexus.commerce.dto.OrderResponse;
 import com.nexus.commerce.services.OrderService;
@@ -7,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -30,9 +32,12 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<OrderResponse> update(@PathVariable Long id, @Valid @RequestBody OrderRequest request) {
-        return ResponseEntity.ok(service.update(id, request));
+    @PatchMapping("/{id}")
+    public ResponseEntity<OrderResponse> updateCustomer(
+            @PathVariable Long id,
+            @Valid @RequestBody OrderCustomerUpdateRequest request
+    ) {
+        return ResponseEntity.ok(service.updateCustomer(id, request));
     }
 
     @DeleteMapping("/{id}")
