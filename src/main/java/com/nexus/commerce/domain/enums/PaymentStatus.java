@@ -4,5 +4,6 @@ public enum PaymentStatus {
     PENDING,
     CONFIRMED,
     DENIED,
-    PROCESS_ERROR
+    PROCESS_ERROR,
+    EXPIRED
 }

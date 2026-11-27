@@ -1,11 +1,11 @@
 package com.nexus.commerce.dto;
 
+import com.nexus.commerce.domain.enums.PaymentMethod;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.UUID;
-
 public record ProcessPaymentRequest(
-        @NotNull(message = "Please provide a order id")
-        Long orderId
+        @NotNull(message = "Please provide an order id")
+        Long orderId,
+        PaymentMethod paymentMethod
 ) {
 }
