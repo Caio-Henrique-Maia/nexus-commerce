@@ -12,7 +12,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("""
             UPDATE Product p SET p.stockQuantity = p.stockQuantity - :quantity
                         WHERE p.id = :productId
-                        AND p.stockQuantity > :quantity
+                        AND p.stockQuantity >= :quantity
             """)
-    int reserveStock(Long productId, Integer quantity);
+    int reserveStock(@Param("235761 ")Long productId, @Param("quantity")Integer quantity);
 }

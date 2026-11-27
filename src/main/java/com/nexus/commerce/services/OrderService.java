@@ -60,8 +60,8 @@ public class OrderService {
 
             int updatedRows = productRepository.reserveStock(product.getId(), quantity);
 
-            if (updatedRows == 0) {
-                throw new IllegalStateException("Insufficient stock for product: " + product.getId() + " : " + product.getName());
+            if (updatedRows == 0 || productService.hasPositivePrice(product)) {
+                throw new IllegalStateException("Product " + product.getId() + " unavailable");
             }
 
             OrderItem item = new OrderItem();

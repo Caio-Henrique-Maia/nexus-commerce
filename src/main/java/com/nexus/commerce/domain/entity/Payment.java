@@ -7,6 +7,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
 import java.util.UUID;
 
 @Entity
@@ -44,9 +48,13 @@ public class Payment {
     @Column(name = "payment_status", nullable = false, length = 30)
     private PaymentStatus paymentStatus;
 
+    @Column(name = "expires_at")
+    private Instant expiresAt;
+
     @PrePersist
-    private void setPaymentStatus() {
+    private void setPaymentStatusAndExpiration() {
         this.paymentStatus = PaymentStatus.PENDING;
+        this.expiresAt = Instant.now().plus(2, ChronoUnit.DAYS);
     }
 
 }
